@@ -53,6 +53,26 @@ function Get-HighestMinorForMajor {
         Select-Object -Last 1
 }
 
+function Install-Chocolatey {
+    Write-Host 'Chocolatey não encontrado. Tentando instalar...' -ForegroundColor Yellow
+
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+
+    $installScript = Invoke-WebRequest 'https://community.chocolatey.org/install.ps1' -UseBasicParsing
+    Invoke-Expression $installScript.Content
+
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
+                [System.Environment]::GetEnvironmentVariable('Path', 'User')
+
+    $installedChoco = Get-Command choco -ErrorAction SilentlyContinue
+    if (-not $installedChoco) {
+        throw 'Falha ao instalar o Chocolatey. Execute o script como Administrador e tente novamente.'
+    }
+
+    Write-Host 'Chocolatey instalado com sucesso.' -ForegroundColor Green
+}
+
 $nodeCommand = Get-Command node -ErrorAction SilentlyContinue
 if (-not $nodeCommand) {
     Write-Host 'Node.js não está instalado neste Windows.' -ForegroundColor Yellow
@@ -65,6 +85,7 @@ Write-Host "Node.js instalado. Versão atual: v$($currentVersion.Text)" -Foregro
 
 $chocoCommand = Get-Command choco -ErrorAction SilentlyContinue
 if (-not $chocoCommand) {
+    Install-Chocolatey
     throw 'Chocolatey (choco) não está instalado. Não é possível atualizar automaticamente.'
 }
 
