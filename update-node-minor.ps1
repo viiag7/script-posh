@@ -81,6 +81,7 @@ function Test-IsVersionGreater {
 
 $nodeCommand = Get-Command node -ErrorAction SilentlyContinue
 if (-not $nodeCommand) {
+    Write-Host 'Node.js não está instalado neste Windows.' -ForegroundColor Yellow
     exit 0
 }
 
