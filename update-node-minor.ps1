@@ -86,6 +86,7 @@ Write-Host "Node.js instalado. Versão atual: v$($currentVersion.Text)" -Foregro
 $chocoCommand = Get-Command choco -ErrorAction SilentlyContinue
 if (-not $chocoCommand) {
     Install-Chocolatey
+    throw 'Chocolatey (choco) não está instalado. Não é possível atualizar automaticamente.'
 }
 
 $targetVersion = Get-HighestMinorForMajor -Major $currentVersion.Major
